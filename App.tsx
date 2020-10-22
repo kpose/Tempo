@@ -16,26 +16,45 @@ type Style = {
   location: TextStyle;
   condition: TextStyle;
   temperature: TextStyle;
-  detailsContainer: TextStyle;
+  searchContainer: TextStyle;
   imageContainer: ImageStyle;
+  conditionBox: ViewStyle;
+  date: ViewStyle;
+  bar: ViewStyle;
 };
-
+import api from './src/utils/api';
+import dateBuilder from './src/utils/dateBuilder';
 import SearchInput from './src/components/SearchInput';
 
 import getImageForWeather from './src/utils/getImageForWeather';
+
 type Props = {
   text: string;
   placeholder: string;
+  name: string;
   //newLocation: string;
   //onSubmit: (p: any) => void;
 };
 
 const App: FC<Props> = () => {
-  const [location, setLocation] = useState('Nigeria');
+  const [, setLocation] = useState('Nigeria');
+  const [weather, setWeather] = useState({});
 
   const onSubmit = (newLocation: string) => {
     setLocation(newLocation);
+
+    fetch(`${api.base}weather?q=${newLocation}&units=metric&APPID=${api.key}`)
+      .then((res) => res.json())
+      .then((result) => {
+        setWeather(result);
+        //setLocation('');
+        console.log(result);
+      });
   };
+
+  /* useEffect(() => {
+    console.log('Top rendered');
+  }, []); */
 
   return (
     <>
@@ -44,10 +63,26 @@ const App: FC<Props> = () => {
         <ImageBackground
           source={getImageForWeather('Snow')}
           style={styles.imageContainer}>
-          <View style={styles.detailsContainer}>
-            <Text style={styles.location}>{location}</Text>
-            <Text style={styles.condition}>Light Thunder</Text>
-            <Text style={styles.temperature}>24°</Text>
+          <View style={styles.conditionBox}>
+            {typeof weather.main != 'undefined' ? (
+              <View>
+                <Text style={styles.location}>
+                  {weather.name}, {weather.sys.country}
+                </Text>
+                <Text style={styles.date}>{dateBuilder(new Date())}</Text>
+                <Text style={styles.condition}>
+                  {weather.weather[0].description}
+                </Text>
+                <Text style={styles.temperature}>
+                  {Math.round(weather.main.temp)}°c
+                </Text>
+              </View>
+            ) : (
+              <Text style={styles.date}>error</Text>
+            )}
+          </View>
+
+          <View style={styles.searchContainer}>
             <SearchInput placeholder="Search any city" onSubmit={onSubmit} />
           </View>
         </ImageBackground>
@@ -66,7 +101,8 @@ const styles = StyleSheet.create<Style>({
   location: {
     textAlign: 'center',
     fontFamily: 'Arial',
-    fontSize: 40,
+    fontWeight: 'bold',
+    fontSize: 50,
     padding: 10,
     color: 'white',
   },
@@ -93,10 +129,32 @@ const styles = StyleSheet.create<Style>({
     height: null,
     resizeMode:'cover'
   }, */
-  detailsContainer: {
+  searchContainer: {
     flex: 1,
     justifyContent: 'center',
     backgroundColor: 'rgba(0,0,0,0.2)',
-    paddingHorizontal: 20,
+    //paddingHorizontal: 20,
+  },
+  conditionBox: {
+    flex: 2,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.2)',
+
+    //paddingHorizontal: 20,
+  },
+  date: {
+    textAlign: 'center',
+    fontFamily: 'Didot',
+    fontStyle: 'italic',
+    fontWeight: '500',
+    fontSize: 25,
+    padding: 10,
+    color: 'white',
+    textShadowColor: 'blue',
+  },
+  bar: {
+    height: 500,
+    width: 300,
+    backgroundColor: 'red',
   },
 });

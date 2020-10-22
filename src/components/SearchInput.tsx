@@ -1,5 +1,5 @@
 import React, {useState, FC} from 'react';
-import {StyleSheet, View, TextInput} from 'react-native';
+import {StyleSheet, View, TextInput, Text} from 'react-native';
 
 type Props = {
   text?: string;
