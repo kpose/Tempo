@@ -1,14 +1,25 @@
 import React, {useState, FC} from 'react';
-import {StyleSheet, View, TextInput} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  StatusBar,
+  KeyboardAvoidingView,
+} from 'react-native';
 
-type Props = {
-  text?: string;
+interface Props {
+  text: string;
+  complete: boolean;
   placeholder: string;
-  onSubmit: (p: any) => void;
-};
+}
 
-const SearchInput: FC<Props> = (props) => {
+export const SearchInput: React.FC<Props> = (props) => {
   const [newlocation, setNewlocation] = useState<string | null>();
+
+  onSubmitEditing = () => {
+    props.onSubmitEditing(newlocation);
+  };
 
   return (
     <View style={styles.container}>
@@ -20,13 +31,11 @@ const SearchInput: FC<Props> = (props) => {
         style={styles.textInput}
         clearButtonMode="always"
         onChangeText={(text) => setNewlocation(text)}
-        onSubmitEditing={() => props.onSubmit(newlocation)}
+        onSubmitEditing={onSubmitEditing}
       />
     </View>
   );
 };
-
-export default SearchInput;
 
 const styles = StyleSheet.create({
   container: {
